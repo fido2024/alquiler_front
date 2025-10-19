@@ -1,10 +1,9 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { Job, JobStatus } from './interfaces/types';
-import { fetchTrabajosCliente } from './services/api';
+import { fetchTrabajosProveedor } from './services/api';
 import { fmt } from './utils/helpers';
 import { useRouter } from 'next/navigation';
-
 
 /* Paleta */
 const C = {
@@ -20,7 +19,6 @@ const C = {
   line:'#1140BC',
   active:'#1366FD',
 } as const;
-
 
 type TabKey = 'all' | JobStatus;
 
@@ -67,10 +65,11 @@ export default function TrabajosAgendadosPage() {
     // setLoading(true); // <--- ELIMINADO
     
     // Llamamos a la API. Esta ahora es la versión MOCK
-    fetchTrabajosCliente('cliente_abc') 
+    fetchTrabajosProveedor('proveedor_123') 
       .then(d => { if (alive) setJobs(d); })
       .catch(err => {
         console.error("Error al cargar trabajos (mock):", err);
+        // Podrías poner un estado de error aquí si quisieras
       });
       // .finally(() => { if (alive) setLoading(false); }); // <--- ELIMINADO
     
@@ -94,7 +93,7 @@ export default function TrabajosAgendadosPage() {
   if (!jobs) {
     return (
       <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
-        <p>Cargando mis trabajos...</p>
+        <p>Cargando trabajos agendados...</p>
       </main>
     );
   }
@@ -104,7 +103,7 @@ export default function TrabajosAgendadosPage() {
     <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 400 }}>
       {/* Título */}
       <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0}}>
-        Mis Trabajos
+        Trabajos Agendados
       </h1>
 
       {/* Línea más delgada */}
@@ -167,16 +166,15 @@ export default function TrabajosAgendadosPage() {
       </div>
 
       {/* Lista */}
-      {/* --- ARREGLO DE SCROLL (Paso 1) --- */}
-      <div className="scrollwrap"
-           style={{ 
-             display:'grid', 
-             gap: 14, 
-             maxHeight: 520, 
-             overflow:'auto', 
-             paddingRight: 8,
-             width: '660px' // <--- AÑADIDO AQUÍ
-           }}>
+<div className="scrollwrap"
+     style={{
+       display: 'grid',
+       gap: 14,
+       maxHeight: 520,
+       overflow: 'auto',
+       paddingRight: 8,
+       width: '660px' // <--- AÑADE ESTA LÍNEA
+     }}>
         {(filtered ?? []).map(job => {
           const { fecha, hora } = fmt(job.startISO);
           const { hora: horaFin } = fmt(job.endISO);
@@ -186,13 +184,12 @@ export default function TrabajosAgendadosPage() {
             job.status === 'done'      ? C.done      : C.cancelled;
 
           return (
-            /* --- ARREGLO DE SCROLL (Paso 2) --- */
             <article key={job.id} style={{
               border: `2.5px solid ${C.borderMain}`,
               borderRadius: 8,
               background: C.white,
-              padding: '14px 18px',
-              // width: '660px' // <--- ELIMINADO DE AQUÍ
+              padding: '14px 18px',  // espaciamiento más uniforme
+              //width: '660px'        // igual ancho que tabs
             }}>
               <div style={{
                 display:'grid',
@@ -202,11 +199,11 @@ export default function TrabajosAgendadosPage() {
                 rowGap: 6,
                 alignItems:'center'
               }}>
-                {/* Cliente (aquí es Proveedor) */}
+                {/* Cliente */}
                 <div style={{ gridColumn:'1', gridRow:'1', display:'flex', gap:8, alignItems:'center'}}>
                   <IcoUser />
                   <div>
-                    <span style={{ color: C.text }}>Proveedor</span><br />
+                    <span style={{ color: C.text }}>Cliente</span><br />
                     <span style={{ color:'#000' }}>{job.clientName}</span>
                   </div>
                 </div>
@@ -234,7 +231,8 @@ export default function TrabajosAgendadosPage() {
                   <button
                     onClick={() => {
                     router.push(
-                     `/epic_VisualizadorDeTrabajosAgendadosVistaCliente/detalles/${encodeURIComponent(job.id)}`
+                     // ESTA RUTA TAMBIÉN DEBE SER VISTAPROVEEDOR
+                     `/epic_VisualizadorDeTrabajosAgendadosVistaProveedor/detalles/${encodeURIComponent(job.id)}`
                       );
                     }
                   }

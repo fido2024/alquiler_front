@@ -7,11 +7,12 @@ import { JobStatus } from '../interfaces/types';
 
 // --- INICIO DE DATOS FALSOS (MOCK) ---
 // 1. Creamos una lista de trabajos falsos.
-// Nota: 'clientName' aquí guardará el nombre del PROVEEDOR
+// Usamos el tipo 'Job' directamente. Esto también arregla
+// la advertencia de 'Job is defined but never used'.
 const MOCK_JOBS: Job[] = [
   {
-    id: 'mock-c1',
-    clientName: 'Juan Carlos Pérez', // <-- Nombre del Proveedor
+    id: 'mock-1',
+    clientName: 'Fidel Vasquez', // ¡Un saludo!
     service: 'Plomería',
     startISO: '2025-10-20T09:00:00.000Z',
     endISO: '2025-10-20T11:00:00.000Z',
@@ -20,8 +21,8 @@ const MOCK_JOBS: Job[] = [
     description: 'Instalación de grifo en la cocina.',
   },
   {
-    id: 'mock-c2',
-    clientName: 'Omar Flores', // <-- Nombre del Proveedor
+    id: 'mock-2',
+    clientName: 'Ana García',
     service: 'Electricidad',
     startISO: '2025-10-21T14:00:00.000Z',
     endISO: '2025-10-21T15:30:00.000Z',
@@ -30,8 +31,8 @@ const MOCK_JOBS: Job[] = [
     description: 'Revisión de tablero eléctrico.',
   },
   {
-    id: 'mock-c3',
-    clientName: 'Yony Chavez', // <-- Nombre del Proveedor
+    id: 'mock-3',
+    clientName: 'Carlos Soliz',
     service: 'Pintura',
     startISO: '2025-10-19T08:00:00.000Z',
     endISO: '2025-10-19T17:00:00.000Z',
@@ -40,8 +41,8 @@ const MOCK_JOBS: Job[] = [
     description: 'Pintar la habitación principal.',
   },
   {
-    id: 'mock-c4',
-    clientName: 'Juandy Pérez', // <-- Nombre del Proveedor
+    id: 'mock-4',
+    clientName: 'Lucía Méndez',
     service: 'Plomería',
     startISO: '2025-10-18T10:00:00.000Z',
     endISO: '2025-10-18T11:00:00.000Z',
@@ -49,20 +50,31 @@ const MOCK_JOBS: Job[] = [
     cancelReason: 'Cliente pospuso la cita.',
     description: 'Reparación de fuga en el baño.',
   },
+  {
+    id: 'mock-5',
+    clientName: 'Rodolfo Argote',
+    service: 'Desarrollo de Software',
+    startISO: '2025-10-22T10:00:00.000Z',
+    endISO: '2025-10-22T18:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Revisión final del proyecto.',
+  }
 ];
 // --- FIN DE DATOS FALSOS (MOCK) ---
 
 
-/** HU 1.8 – Trabajos por CLIENTE (VERSIÓN MOCKEADA PARA QA) */
-export async function fetchTrabajosCliente(clienteId: string, estado?: string): Promise<Job[]> {
+/** HU 1.7 – Trabajos por PROVEEDOR (VERSIÓN MOCKEADA PARA QA) */
+export async function fetchTrabajosProveedor(proveedorId: string, estado?: string): Promise<Job[]> {
   
   // Un mensaje en la consola para que sepas que estás usando datos falsos
   console.log(
-    `%c ⚡ MOCK API (Cliente) ⚡: Devolviendo datos falsos para cliente: ${clienteId}`, 
-    'color: #00BFFF; background: #333; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
+    `%c ⚡ MOCK API ⚡: Devolviendo datos falsos para proveedor: ${proveedorId}`, 
+    'color: #FFD700; background: #333; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
   );
 
-  // 2. Simulamos un retraso de red (0.8 segundos)
+  // 2. Simulamos un retraso de red (1 segundo)
+  // Esto es para que puedas ver tu pantalla de "Cargando..."
   return new Promise((resolve) => {
     setTimeout(() => {
       
@@ -73,7 +85,7 @@ export async function fetchTrabajosCliente(clienteId: string, estado?: string): 
         
       resolve(trabajosFiltrados);
       
-    }, 800); // 800 milisegundos
+    }, 1000); // 1000 milisegundos = 1 segundo
   });
 }
 
@@ -88,8 +100,8 @@ import { convertirAISO, normalizarEstado } from '../utils/helpers';
 
 // Definimos la estructura de los datos "crudos" que vienen de la API
 interface ApiTrabajoRaw {
-  proveedor?: { id: string | number; nombre: string };
-  cliente?: { id: string | number };
+  proveedor?: { id: string | number };
+  cliente?: { id: string | number; nombre: string };
   fecha: string;
   horaInicio: string;
   horaFin: string;
@@ -99,24 +111,25 @@ interface ApiTrabajoRaw {
   descripcion?: string;
 }
 
-export async function fetchTrabajosCliente(clienteId: string, estado?: string) {
-  const url = new URL(`http://localhost:5000/api/vengadores/trabajos/cliente/${clienteId}`); // ← usa param
-  if (estado) url.searchParams.set('estado', estado); // (opcional)
+export async function fetchTrabajosProveedor(proveedorId: string, estado?: string): Promise<Job[]> {
+  const url = new URL(`http://localhost:5000/api/vengadores/trabajos/proveedor`);
+  url.searchParams.set('proveedorId', proveedorId);
+  if (estado) url.searchParams.set('estado', estado); // ← opcional
 
   const res = await fetch(url.toString());
-  if (!res.ok) throw new Error('Error al obtener trabajos del cliente');
+  if (!res.ok) throw new Error('Error al obtener trabajos del proveedor');
   
   // EL ERROR 'any' ESTABA AQUÍ
   const data: ApiTrabajoRaw[] = await res.json();
 
-  // 👇 En Vista Cliente mostramos al PROVEEDOR en el “card header”
+  // 👇 En Vista Proveedor mostramos al CLIENTE en el “card header”
   return data.map((t: ApiTrabajoRaw) => ({ // <-- Se corrige 'any' por 'ApiTrabajoRaw'
     id: `${t.proveedor?.id}-${t.cliente?.id}-${t.fecha}-${t.horaInicio}`,
-    clientName: t.proveedor?.nombre ?? '—', // ← PROVEEDOR
+    clientName: t.cliente?.nombre ?? '—', // ← CLIENTE
     service: t.servicio,
     startISO: convertirAISO(t.fecha, t.horaInicio),
     endISO: convertirAISO(t.fecha, t.horaFin),
-    status: normalizarEstado(t.estado),     // 'Pendiente' -> 'pending'
+    status: normalizarEstado(t.estado),
     cancelReason: t.cancelReason ?? '',
     description: t.descripcion ?? '',
   }));
