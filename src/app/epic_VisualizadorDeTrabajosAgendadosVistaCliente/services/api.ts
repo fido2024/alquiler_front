@@ -7,7 +7,7 @@ import { JobStatus } from '../interfaces/types';
 
 // --- INICIO DE DATOS FALSOS (MOCK) ---
 // 1. Creamos una lista de trabajos falsos.
-// Nota: 'clientName' aquí guardará el nombre del PROVEEDOR
+// Nota: 'clientName' aquí guardará el nombre del PROVEEDOR (persona)
 const MOCK_JOBS: Job[] = [
   {
     id: 'mock-c1',
@@ -49,6 +49,117 @@ const MOCK_JOBS: Job[] = [
     cancelReason: 'Cliente pospuso la cita.',
     description: 'Reparación de fuga en el baño.',
   },
+  // --- 11 NUEVOS TRABAJOS (con nombres de personas) ---
+  {
+    id: 'mock-c5',
+    clientName: 'Mario Fernandez',
+    service: 'Albañilería',
+    startISO: '2025-10-23T08:00:00.000Z',
+    endISO: '2025-10-23T16:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Levantar pared en patio trasero.',
+  },
+  {
+    id: 'mock-c6',
+    clientName: 'Sofia Rojas',
+    service: 'Jardinería',
+    startISO: '2025-10-23T11:00:00.000Z',
+    endISO: '2025-10-23T13:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Mantenimiento mensual de jardín.',
+  },
+  {
+    id: 'mock-c7',
+    clientName: 'David Luna',
+    service: 'Cerrajería',
+    startISO: '2025-10-24T10:30:00.000Z',
+    endISO: '2025-10-24T11:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Cambio de chapa puerta principal.',
+  },
+  {
+    id: 'mock-c8',
+    clientName: 'Valeria Torres',
+    service: 'Limpieza',
+    startISO: '2025-10-24T15:00:00.000Z',
+    endISO: '2025-10-24T18:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Limpieza profunda de departamento.',
+  },
+  {
+    id: 'mock-c9',
+    clientName: 'Jorge Campos',
+    service: 'Gasfitería',
+    startISO: '2025-10-25T09:00:00.000Z',
+    endISO: '2025-10-25T11:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Instalación de calefón.',
+  },
+  {
+    id: 'mock-c10',
+    clientName: 'Clara Montes',
+    service: 'Mudanza',
+    startISO: '2025-10-26T08:00:00.000Z',
+    endISO: '2025-10-26T14:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Servicio de mudanza completo.',
+  },
+  {
+    id: 'mock-c11',
+    clientName: 'Daniel Acosta',
+    service: 'Electricidad',
+    startISO: '2025-10-27T16:00:00.000Z',
+    endISO: '2025-10-27T17:30:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Instalación de 3 lámparas.',
+  },
+  {
+    id: 'mock-c12',
+    clientName: 'Patricia Guzman',
+    service: 'Pintura',
+    startISO: '2025-10-28T09:00:00.000Z',
+    endISO: '2025-10-28T13:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Pintar 2 habitaciones.',
+  },
+  {
+    id: 'mock-c13',
+    clientName: 'Luis Vera',
+    service: 'Albañilería',
+    startISO: '2025-10-29T10:00:00.000Z',
+    endISO: '2025-10-29T12:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Reparación de revoque.',
+  },
+  {
+    id: 'mock-c14',
+    clientName: 'Andrea Mejia',
+    service: 'Cerrajería',
+    startISO: '2025-10-30T14:00:00.000Z',
+    endISO: '2025-10-30T14:30:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Apertura de puerta (llaves olvidadas).',
+  },
+  {
+    id: 'mock-c15',
+    clientName: 'Ricardo Solis',
+    service: 'Gasfitería',
+    startISO: '2025-10-31T09:00:00.000Z',
+    endISO: '2025-10-31T10:00:00.000Z',
+    status: 'pending',
+    cancelReason: '',
+    description: 'Revisión de tuberías.',
+  },
 ];
 // --- FIN DE DATOS FALSOS (MOCK) ---
 
@@ -79,8 +190,8 @@ export async function fetchTrabajosCliente(clienteId: string, estado?: string): 
 
 
 // ---------------------------------------------------------------
-// AQUÍ ABAJO ESTÁ TU CÓDIGO ORIGINAL (EL QUE DABA ERROR 'any')
-// Lo guardamos comentado para que lo uses cuando tu backend esté listo.
+// AQUÍ ABAJO ESTÁ EL CÓDIGO ORIGINAL (EL QUE DABA ERROR 'any')
+//
 // ---------------------------------------------------------------
 /*
 import { Job } from '../interfaces/types';
