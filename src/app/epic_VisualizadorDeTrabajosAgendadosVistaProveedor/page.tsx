@@ -5,6 +5,7 @@ import { fetchTrabajosProveedor } from './services/api';
 import { fmt } from './utils/helpers';
 import { useRouter } from 'next/navigation';
 
+
 /* Paleta */
 const C = {
   title:'#0C4FE9',
@@ -56,23 +57,16 @@ export default function TrabajosAgendadosPage() {
   const [jobs, setJobs] = useState<Job[] | null>(null);
   const router = useRouter();
   
-  // --- CAMBIOS AQUÍ ---
-  // Se eliminaron 'loading', 'setLoading', 'details' y 'setDetails'
-  // porque no se estaban usando en el JSX, causando las advertencias.
-
   useEffect(() => {
     let alive = true;
-    // setLoading(true); // <--- ELIMINADO
-    
+
     // Llamamos a la API. Esta ahora es la versión MOCK
     fetchTrabajosProveedor('proveedor_123') 
       .then(d => { if (alive) setJobs(d); })
       .catch(err => {
         console.error("Error al cargar trabajos (mock):", err);
-        // Podrías poner un estado de error aquí si quisieras
       });
-      // .finally(() => { if (alive) setLoading(false); }); // <--- ELIMINADO
-    
+
     return () => { alive = false; };
   }, []); // El 'useEffect' se ejecuta solo una vez al cargar
 
@@ -87,32 +81,27 @@ export default function TrabajosAgendadosPage() {
     return tab === 'all' ? jobs : jobs.filter(j => j.status === tab);
   }, [jobs, tab]);
 
-      // Si no hay trabajos, mostramos el mensaje
-  if (jobs?.length === 0) {
-    return (
-      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
-        <p style={{ color: 'red' }}>PAGINA EN CONSTRUCCION</p>
-      </main>
-    );
-  }
-
-  // --- NUEVO ESTADO DE CARGA ---
-  // Mientras 'jobs' sea null (porque la API falsa está "esperando"),
-  // mostramos un mensaje de carga.
+  // Mientras 'jobs' sea null (esperando la carga), mostramos un mensaje de carga
   if (!jobs) {
     return (
       <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
-        <p>Cargando trabajos agendados...</p>
+        <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Mis Trabajos</h1>
+        <div style={{
+          height: 1.5,
+          width: '660px',
+          background: C.line,
+          marginBottom: 10
+        }} />
+        <p>Cargando mis trabajos...</p>
       </main>
     );
   }
 
-  // Si 'jobs' no es null, mostramos la página normal:
   return (
     <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 400 }}>
       {/* Título */}
-      <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0}}>
-        Trabajos Agendados
+      <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>
+        Mis Trabajos
       </h1>
 
       {/* Línea más delgada */}
@@ -166,7 +155,7 @@ export default function TrabajosAgendadosPage() {
             >
               {k === 'all' ? 'Todos'
                 : k === 'confirmed' ? 'Confirmados'
-                : k === 'pending' ? `Pendientes${badge>0 ? ` (${badge})` : ''}`
+                : k === 'pending' ? `Pendientes${badge > 0 ? ` (${badge})` : ''}`
                 : k === 'cancelled' ? 'Cancelados'
                 : 'Terminados'}
             </button>
@@ -175,15 +164,15 @@ export default function TrabajosAgendadosPage() {
       </div>
 
       {/* Lista */}
-<div className="scrollwrap"
-     style={{
-       display: 'grid',
-       gap: 14,
-       maxHeight: 520,
-       overflow: 'auto',
-       paddingRight: 8,
-       width: '660px' // <--- AÑADE ESTA LÍNEA
-     }}>
+      <div className="scrollwrap"
+           style={{ 
+             display:'grid', 
+             gap: 14, 
+             maxHeight: 520, 
+             overflow:'auto', 
+             paddingRight: 8,
+             width: '660px' 
+           }}>
         {(filtered ?? []).map(job => {
           const { fecha, hora } = fmt(job.startISO);
           const { hora: horaFin } = fmt(job.endISO);
@@ -197,8 +186,7 @@ export default function TrabajosAgendadosPage() {
               border: `2.5px solid ${C.borderMain}`,
               borderRadius: 8,
               background: C.white,
-              padding: '14px 18px',  // espaciamiento más uniforme
-              //width: '660px'        // igual ancho que tabs
+              padding: '14px 18px',
             }}>
               <div style={{
                 display:'grid',
@@ -212,7 +200,7 @@ export default function TrabajosAgendadosPage() {
                 <div style={{ gridColumn:'1', gridRow:'1', display:'flex', gap:8, alignItems:'center'}}>
                   <IcoUser />
                   <div>
-                    <span style={{ color: C.text }}>Cliente</span><br />
+                    <span style={{ color: C.text }}>Proveedor</span><br />
                     <span style={{ color:'#000' }}>{job.clientName}</span>
                   </div>
                 </div>
@@ -235,32 +223,34 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                {/* Botón “Ver Detalles” */}
-                <div style={{ gridColumn:'4', gridRow:'1 / span 2', display:'flex', justifyContent:'flex-end' }}>
-                  <button
-                    onClick={() => {
-                    router.push(
-                     // ESTA RUTA TAMBIÉN DEBE SER VISTAPROVEEDOR
-                     `/epic_VisualizadorDeTrabajosAgendadosVistaProveedor/detalles/${encodeURIComponent(job.id)}`
-                      );
-                    }
-                  }
-                    style={{
-                      padding: '8px 14px',
-                      minWidth: 110,
-                      height: 36,
-                      borderRadius: 8,
-                      background: C.confirmed,
-                      color: C.white,
-                      border: 'none',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Ver Detalles
-                  </button>
-                </div>
 
-                {/* Estado (radio 12px) */}
+                  // Dentro del componente
+
+                  const router = useRouter();
+
+                  { /* Botón “Ver Detalles” */}
+                  <div style={{ gridColumn: '4', gridRow: '1 / span 2', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => {
+                        // Aquí se redirige a la página de detalles
+                        router.push('/epic_VerDetallesAmbos'); // Asegúrate de que esta ruta coincida con tu configuración de rutas en Next.js
+                      }}
+                      style={{
+                        padding: '8px 14px',
+                        minWidth: 110,
+                        height: 36,
+                        borderRadius: 8,
+                        background: C.confirmed,
+                        color: C.white,
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Ver Detalles
+                    </button>
+                  </div>
+
+                {/* Estado */}
                 <div style={{ gridColumn:'1', gridRow:'2' }}>
                   <div style={{
                     display:'inline-block',
@@ -269,6 +259,7 @@ export default function TrabajosAgendadosPage() {
                     background: chipBg,
                     color: job.status === 'pending' ? '#000000' : C.white  // ← negro solo para “Pendiente”
                   }}>
+
                     {job.status === 'confirmed' ? 'Confirmado'
                       : job.status === 'pending' ? 'Pendiente'
                       : job.status === 'done' ? 'Terminado' : 'Cancelado'}
@@ -310,7 +301,12 @@ export default function TrabajosAgendadosPage() {
           border-color: ${C.active} !important;
           color: ${C.white} !important;
         }
+
+
+        
       `}</style>
+
+      
     </main>
   );
 }
