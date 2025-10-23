@@ -87,6 +87,15 @@ export default function TrabajosAgendadosPage() {
     return tab === 'all' ? jobs : jobs.filter(j => j.status === tab);
   }, [jobs, tab]);
 
+      // Si no hay trabajos, mostramos el mensaje
+  if (jobs?.length === 0) {
+    return (
+      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
+        <p style={{ color: 'red' }}>PAGINA EN CONSTRUCCION</p>
+      </main>
+    );
+  }
+
   // --- NUEVO ESTADO DE CARGA ---
   // Mientras 'jobs' sea null (porque la API falsa está "esperando"),
   // mostramos un mensaje de carga.
