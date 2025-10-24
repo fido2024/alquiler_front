@@ -13,7 +13,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c1',
     clientName: 'Juan Carlos Pérez', // <-- Nombre del Proveedor
     service: 'Plomería',
-    startISO: '2025-10-20T09:00:00.000Z',
+    startISO: '2025-10-20T09:00:00.000Z', // Oct 20
     endISO: '2025-10-20T11:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -23,7 +23,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c2',
     clientName: 'Omar Flores', // <-- Nombre del Proveedor
     service: 'Electricidad',
-    startISO: '2025-10-21T14:00:00.000Z',
+    startISO: '2025-10-21T14:00:00.000Z', // Oct 21
     endISO: '2025-10-21T15:30:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -33,7 +33,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c3',
     clientName: 'Yony Chavez', // <-- Nombre del Proveedor
     service: 'Pintura',
-    startISO: '2025-10-19T08:00:00.000Z',
+    startISO: '2025-10-19T08:00:00.000Z', // Oct 19
     endISO: '2025-10-19T17:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -43,18 +43,17 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c4',
     clientName: 'Juandy Pérez', // <-- Nombre del Proveedor
     service: 'Plomería',
-    startISO: '2025-10-18T10:00:00.000Z',
+    startISO: '2025-10-18T10:00:00.000Z', // Oct 18
     endISO: '2025-10-18T11:00:00.000Z',
     status: 'pending',
     cancelReason: 'Cliente pospuso la cita.',
     description: 'Reparación de fuga en el baño.',
   },
-  // --- 11 NUEVOS TRABAJOS (con nombres de personas) ---
   {
     id: 'mock-c5',
     clientName: 'Mario Fernandez',
     service: 'Albañilería',
-    startISO: '2025-10-23T08:00:00.000Z',
+    startISO: '2025-10-23T08:00:00.000Z', // Oct 23
     endISO: '2025-10-23T16:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -64,7 +63,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c6',
     clientName: 'Sofia Rojas',
     service: 'Jardinería',
-    startISO: '2025-10-23T11:00:00.000Z',
+    startISO: '2025-10-23T11:00:00.000Z', // Oct 23
     endISO: '2025-10-23T13:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -74,7 +73,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c7',
     clientName: 'David Luna',
     service: 'Cerrajería',
-    startISO: '2025-10-24T10:30:00.000Z',
+    startISO: '2025-10-24T10:30:00.000Z', // Oct 24
     endISO: '2025-10-24T11:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -84,7 +83,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c8',
     clientName: 'Valeria Torres',
     service: 'Limpieza',
-    startISO: '2025-10-24T15:00:00.000Z',
+    startISO: '2025-10-24T15:00:00.000Z', // Oct 24
     endISO: '2025-10-24T18:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -94,7 +93,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c9',
     clientName: 'Jorge Campos',
     service: 'Gasfitería',
-    startISO: '2025-10-25T09:00:00.000Z',
+    startISO: '2025-10-25T09:00:00.000Z', // Oct 25
     endISO: '2025-10-25T11:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -104,7 +103,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c10',
     clientName: 'Clara Montes',
     service: 'Mudanza',
-    startISO: '2025-10-26T08:00:00.000Z',
+    startISO: '2025-10-26T08:00:00.000Z', // Oct 26
     endISO: '2025-10-26T14:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -114,7 +113,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c11',
     clientName: 'Daniel Acosta',
     service: 'Electricidad',
-    startISO: '2025-10-27T16:00:00.000Z',
+    startISO: '2025-10-27T16:00:00.000Z', // Oct 27
     endISO: '2025-10-27T17:30:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -124,7 +123,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c12',
     clientName: 'Patricia Guzman',
     service: 'Pintura',
-    startISO: '2025-10-28T09:00:00.000Z',
+    startISO: '2025-10-28T09:00:00.000Z', // Oct 28
     endISO: '2025-10-28T13:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -134,7 +133,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c13',
     clientName: 'Luis Vera',
     service: 'Albañilería',
-    startISO: '2025-10-29T10:00:00.000Z',
+    startISO: '2025-10-29T10:00:00.000Z', // Oct 29
     endISO: '2025-10-29T12:00:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -144,7 +143,7 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c14',
     clientName: 'Andrea Mejia',
     service: 'Cerrajería',
-    startISO: '2025-10-30T14:00:00.000Z',
+    startISO: '2025-10-30T14:00:00.000Z', // Oct 30
     endISO: '2025-10-30T14:30:00.000Z',
     status: 'pending',
     cancelReason: '',
@@ -154,39 +153,52 @@ const MOCK_JOBS: Job[] = [
     id: 'mock-c15',
     clientName: 'Ricardo Solis',
     service: 'Gasfitería',
-    startISO: '2025-10-31T09:00:00.000Z',
+    startISO: '2025-10-31T09:00:00.000Z', // Oct 31
     endISO: '2025-10-31T10:00:00.000Z',
     status: 'pending',
     cancelReason: '',
     description: 'Revisión de tuberías.',
   },
 ];
+
 // --- FIN DE DATOS FALSOS (MOCK) ---
+
+// --- ¡NUEVA LÍNEA! ---
+// Ordenamos el array MOCK_JOBS por fecha de inicio (startISO) en orden descendente (más reciente primero)
+MOCK_JOBS.sort((a, b) => b.startISO.localeCompare(a.startISO));
+// --------------------
 
 
 /** HU 1.8 – Trabajos por CLIENTE (VERSIÓN MOCKEADA PARA QA) */
 export async function fetchTrabajosCliente(clienteId: string, estado?: string): Promise<Job[]> {
   
-  // Un mensaje en la consola para que sepas que estás usando datos falsos
   console.log(
-    `%c ⚡ MOCK API (Cliente) ⚡: Devolviendo datos falsos para cliente: ${clienteId}`, 
+    `%c ⚡ MOCK API (Cliente) ⚡: Devolviendo datos falsos (ordenados) para cliente: ${clienteId}`, 
     'color: #00BFFF; background: #333; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
   );
 
-  // 2. Simulamos un retraso de red (0.8 segundos)
+  // Simulamos un retraso de red
   return new Promise((resolve) => {
     setTimeout(() => {
       
-      // 3. Simulamos el filtro por 'estado' que tu backend haría
+      // Filtramos la lista YA ORDENADA
       const trabajosFiltrados = (estado && estado !== 'all' && estado !== undefined)
         ? MOCK_JOBS.filter(job => job.status === estado)
-        : MOCK_JOBS;
+        : MOCK_JOBS; // Si es 'all' o no hay estado, devuelve la lista completa (ya ordenada)
         
       resolve(trabajosFiltrados);
       
     }, 800); // 800 milisegundos
   });
 }
+
+
+// ---------------------------------------------------------------
+// CÓDIGO ORIGINAL COMENTADO (sin cambios)
+// ---------------------------------------------------------------
+/*
+... (el resto del código comentado sigue igual) ...
+*/
 
 
 // ---------------------------------------------------------------

@@ -64,7 +64,7 @@ export default function TrabajosAgendadosPage() {
   useEffect(() => {
     let alive = true;
 
-    // Llamamos a la API. Esta ahora es la versión MOCK
+    // Llamamos a la API (Mock).
     fetchTrabajosProveedor('proveedor_123')
       .then((d) => {
         if (alive) setJobs(d);
@@ -76,7 +76,7 @@ export default function TrabajosAgendadosPage() {
     return () => {
       alive = false;
     };
-  }, []); // El 'useEffect' se ejecuta solo una vez al cargar
+  }, []); 
 
   const counts = useMemo(() => {
     const c = { confirmed: 0, pending: 0, cancelled: 0, done: 0 } as Record<JobStatus, number>;
@@ -89,41 +89,56 @@ export default function TrabajosAgendadosPage() {
     return tab === 'all' ? jobs : jobs.filter((j) => j.status === tab);
   }, [jobs, tab]);
 
-  // Lógica para manejar la paginación
+  // Lógica de paginación
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginatedJobs = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
+    // Asegurarse de que totalPages se recalcule si filtered cambia
+    if (currentPage > Math.ceil(filtered.length / ITEMS_PER_PAGE) && filtered.length > 0) {
+      setCurrentPage(1); // Reset page if out of bounds after filtering
+    }
     return filtered.slice(startIndex, endIndex);
   }, [filtered, currentPage]);
 
-  // Si no hay trabajos en los estados confirmados, pendientes, cancelados, o terminados, mostramos el mensaje
-  if (
-    (tab === 'confirmed' && counts.confirmed === 0) ||
-    (tab === 'pending' && counts.pending === 0) ||
-    (tab === 'cancelled' && counts.cancelled === 0) ||
-    (tab === 'done' && counts.done === 0)
-  ) {
-    return (
-      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Trabajos Agendados</h1>
-        <div style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
-        <p style={{ color: 'red', fontSize: '24px', fontWeight: 700 }}>DISPONIBLE EN EL SEGUNDO SPRINT</p>
-      </main>
-    );
-  }
-
-  // Mientras 'jobs' sea null (esperando la carga), mostramos un mensaje de carga
+  // Estado de carga inicial
   if (!jobs) {
     return (
-      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
+      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px' }}>
         <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Trabajos Agendados</h1>
         <div style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
-        <p>Cargando mis trabajos...</p>
+        <p style={{textAlign: 'center'}}>Cargando trabajos...</p>
       </main>
     );
   }
 
+  // Mensaje "Segundo Sprint" si una tab específica (no 'all') está vacía
+  if (tab !== 'all' && counts[tab] === 0) {
+    return (
+      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px' }}>
+        <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Trabajos Agendados</h1>
+        <div style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
+        {/* Renderiza los Tabs aunque esté vacío */}
+        <TabsComponent tab={tab} setTab={setTab} counts={counts} setCurrentPage={setCurrentPage} />
+        <p style={{ color: 'red', fontSize: '24px', fontWeight: 700, marginTop: 40, textAlign: 'center' }}>DISPONIBLE EN EL SEGUNDO SPRINT</p>
+      </main>
+    );
+  }
+
+  // Mensaje "No hay trabajos" si la tab 'all' está vacía
+  if (tab === 'all' && filtered.length === 0) {
+    return (
+      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px' }}>
+        <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Trabajos Agendados</h1>
+        <div style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
+        {/* Renderiza los Tabs aunque esté vacío */}
+        <TabsComponent tab={tab} setTab={setTab} counts={counts} setCurrentPage={setCurrentPage} />
+        <p style={{ color: C.text, fontSize: '22px', fontWeight: 500, marginTop: 40, textAlign: 'center' }}>No tienes trabajos agendados.</p>
+      </main>
+    );
+  }
+
+  // Renderizado principal
   return (
     <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 400 }}>
       {/* Título */}
@@ -140,61 +155,7 @@ export default function TrabajosAgendadosPage() {
       />
 
       {/* Tabs */}
-      <div role="tablist" aria-label="Filtros de estado" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
-        {(['all', 'confirmed', 'pending', 'cancelled', 'done'] as TabKey[]).map((k) => {
-          const active = tab === k;
-          const badge =
-            k === 'all'
-              ? jobs?.length ?? 0
-              : k === 'confirmed'
-              ? counts.confirmed
-              : k === 'pending'
-              ? counts.pending
-              : k === 'cancelled'
-              ? counts.cancelled
-              : counts.done;
-
-          const baseBtn: React.CSSProperties = {
-            borderRadius: 8,
-            border: `2px solid ${C.borderBtn}`,
-            background: active ? C.active : C.white,
-            color: active ? C.white : C.text,
-            fontWeight: 400,
-            fontSize: 16,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            padding: '8px 14px',
-            lineHeight: '22px',
-          };
-
-          const isAll = k === 'all';
-          const allSize: React.CSSProperties = isAll
-            ? {
-                padding: '8px 16px',
-                minWidth: 120,
-                height: 40,
-              }
-            : {};
-
-          return (
-            <button key={k} onClick={() => setTab(k)} style={{ ...baseBtn, ...allSize }}>
-              {k === 'all'
-                ? 'Todos'
-                : k === 'confirmed'
-                ? 'Confirmados'
-                : k === 'pending'
-                ? `Pendientes${badge > 0 ? ` (${badge})` : ''}`
-                : k === 'cancelled'
-                ? 'Cancelados'
-                : 'Terminados'}
-            </button>
-          );
-        })}
-      </div>
+      <TabsComponent tab={tab} setTab={setTab} counts={counts} setCurrentPage={setCurrentPage} />
 
       {/* Lista */}
       <div
@@ -221,6 +182,7 @@ export default function TrabajosAgendadosPage() {
               : C.cancelled;
 
           return (
+            // Corrección de sintaxis en 'border'
             <article key={job.id} style={{ border: `2.5px solid ${C.borderMain}`, borderRadius: 8, background: C.white, padding: '14px 18px' }}>
               <div
                 style={{
@@ -236,7 +198,8 @@ export default function TrabajosAgendadosPage() {
                 <div style={{ gridColumn: '1', gridRow: '1', display: 'flex', gap: 8, alignItems: 'center' }}>
                   <IcoUser />
                   <div>
-                    <span style={{ color: C.text }}>Proveedor</span>
+                    {/* Texto correcto para Vista Proveedor */}
+                    <span style={{ color: C.text }}>Cliente</span> 
                     <br />
                     <span style={{ color: '#000' }}>{job.clientName}</span>
                   </div>
@@ -266,7 +229,10 @@ export default function TrabajosAgendadosPage() {
                 <div style={{ gridColumn: '4', gridRow: '1 / span 2', display: 'flex', justifyContent: 'flex-end' }}>
                   <button
                     onClick={() => {
-                      router.push('/epic_VerDetallesAmbos'); // Asegúrate de que esta ruta coincida con tu configuración de rutas en Next.js
+                      // Ruta correcta pasando el ID
+                      router.push(
+                        `/epic_VerDetallesAmbos?id=${encodeURIComponent(job.id)}`
+                      );
                     }}
                     style={{
                       padding: '8px 14px',
@@ -291,7 +257,7 @@ export default function TrabajosAgendadosPage() {
                       padding: '8px 16px',
                       borderRadius: 12,
                       background: chipBg,
-                      color: job.status === 'pending' ? '#000000' : C.white, // ← negro solo para “Pendiente”
+                      color: job.status === 'pending' ? '#000000' : C.white, 
                     }}
                   >
                     {job.status === 'confirmed'
@@ -329,40 +295,177 @@ export default function TrabajosAgendadosPage() {
         })}
       </div>
 
-      {/* Paginación */}
-      {totalPages > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            style={{
-              padding: '10px 15px',
-              borderRadius: 5,
-              border: '1px solid #ddd',
-              backgroundColor: C.white,
-              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Anterior
-          </button>
-          <span style={{ margin: '0 10px', fontSize: '16px' }}>
-            Página {currentPage} de {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            style={{
-              padding: '10px 15px',
-              borderRadius: 5,
-              border: '1px solid #ddd',
-              backgroundColor: C.white,
-              cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Siguiente
-          </button>
-        </div>
-      )}
+      {/* SECCIÓN DE PAGINACIÓN Y VOLVER (como en Cliente) */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center', 
+        marginTop: '20px', 
+        width: '660px' 
+      }}>
+        
+        {/* Botón Volver */}
+        <button
+          onClick={() => router.push('/')} 
+          style={{
+            padding: '10px 20px',
+            height: 40,
+            borderRadius: 8,
+            background: C.confirmed, 
+            color: C.white,
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}
+        >
+          Volver
+        </button>
+
+        {/* Controles de Paginación */}
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              style={{
+                padding: '10px 15px',
+                borderRadius: 5,
+                border: '1px solid #ddd',
+                background: C.white,
+                color: C.text,
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                opacity: currentPage === 1 ? 0.6 : 1,
+              }}
+            >
+              Anterior
+            </button>
+            
+            <span style={{ color: C.text, fontSize: '16px', fontWeight: 500 }}>
+              Página {currentPage} de {totalPages}
+            </span>
+            
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: '10px 15px',
+                borderRadius: 5,
+                border: '1px solid #ddd',
+                background: C.white,
+                color: C.text,
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                opacity: currentPage === totalPages ? 0.6 : 1,
+              }}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
+
+        {/* Relleno si no hay paginación */}
+        {totalPages <= 1 && (
+          <div /> 
+        )}
+      </div>
+
+      {/* Estilos del Scrollbar */}
+      <style jsx global>{`
+        .scrollwrap::-webkit-scrollbar { width: 10px; }
+        .scrollwrap::-webkit-scrollbar-track { background: #cbd9ff; }
+        .scrollwrap::-webkit-scrollbar-thumb { background: ${C.text}; border-radius: 0; }
+        .scrollwrap { scrollbar-color: ${C.text} #cbd9ff; }
+
+        button:active {
+          background: ${C.active} !important;
+          border-color: ${C.active} !important; /* Corregido: important */
+          color: ${C.white} !important;
+        }
+      `}</style>
+
     </main>
+  );
+}
+
+
+// --- COMPONENTE DE TABS REFACTORIZADO (igual que en Cliente) ---
+
+interface TabsProps {
+  tab: TabKey;
+  setTab: (tab: TabKey) => void;
+  setCurrentPage: (page: number) => void;
+  counts: Record<JobStatus, number>;
+}
+
+function TabsComponent({ tab, setTab, counts, setCurrentPage }: TabsProps) {
+  return (
+    
+    <div 
+      role="tablist" 
+      aria-label="Filtros de estado" 
+      style={{ 
+        display: 'flex', 
+        gap: 12, 
+        marginBottom: 14, 
+        width: '660px' 
+      }}
+    >
+      {(['all', 'confirmed', 'pending', 'cancelled', 'done'] as TabKey[]).map((k) => {
+        const active = tab === k;
+        const badge =
+          k === 'all'
+            ? (counts.confirmed + counts.pending + counts.cancelled + counts.done) 
+            : counts[k];
+
+        // Corrección de sintaxis en 'border'
+        const baseBtn: React.CSSProperties = {
+          borderRadius: 8,
+          border: `2px solid ${C.borderBtn}`, 
+          background: active ? C.active : C.white,
+          color: active ? C.white : C.text,
+          fontWeight: 400,
+          fontSize: 16,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          padding: '8px 12px', 
+          lineHeight: '22px',
+          whiteSpace: 'nowrap', 
+        };
+
+        const isAll = k === 'all';
+        const allSize: React.CSSProperties = isAll
+          ? {
+              padding: '8px 14px', 
+              minWidth: 115, 
+              height: 40,
+            }
+          : {};
+
+        return (
+          <button 
+            key={k} 
+            onClick={() => {
+              setTab(k);
+              setCurrentPage(1); 
+            }} 
+            style={{ ...baseBtn, ...allSize }}
+          >
+            {k === 'all'
+              ? `Todos (${badge})` 
+              : k === 'confirmed'
+              ? `Confirmados (${badge})` 
+              : k === 'pending'
+              ? `Pendientes (${badge})` 
+              : k === 'cancelled'
+              ? `Cancelados (${badge})` 
+              : `Terminados (${badge})`}
+          </button>
+        );
+      })}
+    </div>
   );
 }
