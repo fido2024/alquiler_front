@@ -22,6 +22,8 @@ const C = {
 
 type TabKey = 'all' | JobStatus;
 
+const ITEMS_PER_PAGE = 10; // Número de trabajos por página
+
 /* Íconos */
 const IcoUser = ({ size = 24, color = C.text }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -56,6 +58,7 @@ const IcoClock = ({ size = 24, color = C.text }: { size?: number; color?: string
 export default function TrabajosAgendadosPage() {
   const [tab, setTab] = useState<TabKey>('all');
   const [jobs, setJobs] = useState<Job[] | null>(null);
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
   const router = useRouter();
 
   useEffect(() => {
@@ -85,6 +88,14 @@ export default function TrabajosAgendadosPage() {
     if (!jobs) return [];
     return tab === 'all' ? jobs : jobs.filter((j) => j.status === tab);
   }, [jobs, tab]);
+
+  // Lógica para manejar la paginación
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginatedJobs = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filtered.slice(startIndex, endIndex);
+  }, [filtered, currentPage]);
 
   // Si no hay trabajos en los estados confirmados, pendientes, cancelados, o terminados, mostramos el mensaje
   if (
@@ -197,7 +208,7 @@ export default function TrabajosAgendadosPage() {
           width: '660px',
         }}
       >
-        {(filtered ?? []).map((job) => {
+        {paginatedJobs.map((job) => {
           const { fecha, hora } = fmt(job.startISO);
           const { hora: horaFin } = fmt(job.endISO);
           const chipBg =
@@ -251,11 +262,11 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                {/* Botón “Ver Detalles” */}
+                  {/* Botón “Ver Detalles” */}
                 <div style={{ gridColumn: '4', gridRow: '1 / span 2', display: 'flex', justifyContent: 'flex-end' }}>
                   <button
                     onClick={() => {
-                      alert('PAGINA EN CONSTRUCCION'); // Mostrar "Página en construcción" al hacer clic
+                      router.push('/epic_VerDetallesAmbos'); // Asegúrate de que esta ruta coincida con tu configuración de rutas en Next.js
                     }}
                     style={{
                       padding: '8px 14px',
@@ -318,28 +329,40 @@ export default function TrabajosAgendadosPage() {
         })}
       </div>
 
-      {/* Scrollbar */}
-      <style jsx global>{`
-        .scrollwrap::-webkit-scrollbar {
-          width: 10px;
-        }
-        .scrollwrap::-webkit-scrollbar-track {
-          background: #cbd9ff;
-        }
-        .scrollwrap::-webkit-scrollbar-thumb {
-          background: ${C.text};
-          border-radius: 0;
-        }
-        .scrollwrap {
-          scrollbar-color: ${C.text} #cbd9ff;
-        }
-
-        button:active {
-          background: ${C.active} !important;
-          border-color: ${C.active} !important;
-          color: ${C.white} !important;
-        }
-      `}</style>
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            style={{
+              padding: '10px 15px',
+              borderRadius: 5,
+              border: '1px solid #ddd',
+              backgroundColor: C.white,
+              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Anterior
+          </button>
+          <span style={{ margin: '0 10px', fontSize: '16px' }}>
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            style={{
+              padding: '10px 15px',
+              borderRadius: 5,
+              border: '1px solid #ddd',
+              backgroundColor: C.white,
+              cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
     </main>
   );
 }
