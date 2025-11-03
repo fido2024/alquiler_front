@@ -1,4 +1,8 @@
+
+
+import { fetchTrabajosCliente } from '@/app/epic_VisualizadorDeTrabajosAgendadosVistaCliente/services/api';
 import { Job } from '../interfaces/types';
+export type Role = 'cliente' | 'proveedor';
 // Importamos 'JobStatus' para usarlo en nuestros mocks
 import { JobStatus } from '../interfaces/types';
 // Las funciones 'convertirAISO' y 'normalizarEstado' no las necesitamos aquí
@@ -157,7 +161,37 @@ const MOCK_JOBS: Job[] = [
     status: 'pending',
     cancelReason: '',
     description: 'Apertura de puerta (llaves olvidadas).',
-  }
+  },
+  {
+    id: 'mock-c16',
+    clientName: 'Armando Paredes',
+    service: 'Albañil',
+    startISO: '2025-11-25T10:00:00.000Z', // Nov 25
+    endISO: '2025-11-25T11:00:00.000Z',
+    status: 'cancelled',
+    cancelReason: 'Tuve que cancelar porque habia bloqueos y no pude llegar.',
+    description: 'El trabajo es la construcción de un muro perimetral de 20 metros.',
+  },
+  {
+    id: 'mock-c17',
+    clientName: 'Isac Diaz',
+    service: 'Albañil',
+    startISO: '2025-11-25T10:00:00.000Z', // Nov 25
+    endISO: '2025-11-25T11:00:00.000Z',
+    status: 'done',
+    cancelReason: '',
+    description: 'El trabajo es la construcción de un muro perimetral de 20 metros.',
+  },
+{
+    id: 'mock-c18',
+    clientName: 'Dabel Lucana',
+    service: 'Carpintería',
+    startISO: '2025-11-25T15:00:00.000Z', // Nov 25
+    endISO: '2025-11-25T16:00:00.000Z',
+    status: 'cancelled',
+    cancelReason: '',
+    description: 'Arreglar la puerta del garaje.',
+  },
 ];
 // --- FIN DE DATOS FALSOS (MOCK) ---
 
@@ -191,27 +225,26 @@ export async function fetchTrabajosProveedor(proveedorId: string, estado?: strin
 }
 
 
-// ---------------------------------------------------------------
-// AQUÍ ABAJO ESTÁ TU CÓDIGO ORIGINAL (EL QUE DABA ERROR 'any')
-// Lo guardamos comentado para que lo uses cuando tu backend esté listo.
-// ---------------------------------------------------------------
-/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* LOQUE ESTABA ANTES
 import { Job } from '../interfaces/types';
 import { convertirAISO, normalizarEstado } from '../utils/helpers';
 
-// Definimos la estructura de los datos "crudos" que vienen de la API
-interface ApiTrabajoRaw {
-  proveedor?: { id: string | number };
-  cliente?: { id: string | number; nombre: string };
-  fecha: string;
-  horaInicio: string;
-  horaFin: string;
-  servicio: string;
-  estado: string;
-  cancelReason?: string;
-  descripcion?: string;
-}
-
+/** HU 1.7 – Trabajos por PROVEEDOR 
 export async function fetchTrabajosProveedor(proveedorId: string, estado?: string): Promise<Job[]> {
   const url = new URL(`http://localhost:5000/api/vengadores/trabajos/proveedor`);
   url.searchParams.set('proveedorId', proveedorId);
@@ -219,12 +252,10 @@ export async function fetchTrabajosProveedor(proveedorId: string, estado?: strin
 
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error('Error al obtener trabajos del proveedor');
-  
-  // EL ERROR 'any' ESTABA AQUÍ
-  const data: ApiTrabajoRaw[] = await res.json();
+  const data = await res.json();
 
   // 👇 En Vista Proveedor mostramos al CLIENTE en el “card header”
-  return data.map((t: ApiTrabajoRaw) => ({ // <-- Se corrige 'any' por 'ApiTrabajoRaw'
+  return data.map((t: any) => ({
     id: `${t.proveedor?.id}-${t.cliente?.id}-${t.fecha}-${t.horaInicio}`,
     clientName: t.cliente?.nombre ?? '—', // ← CLIENTE
     service: t.servicio,

@@ -159,6 +159,38 @@ const MOCK_JOBS: Job[] = [
     cancelReason: '',
     description: 'Revisión de tuberías.',
   },
+  {
+    id: 'mock-c16',
+    clientName: 'Juan Perez',
+    service: 'Albañil',
+    startISO: '2025-11-25T10:00:00.000Z', // Nov 25
+    endISO: '2025-11-25T11:00:00.000Z',
+    status: 'cancelled',
+    cancelReason: 'Tuve que cancelar porque habia bloqueos y no pude llegar.',
+    description: 'El trabajo es la construcción de un muro perimetral de 20 metros.',
+  },
+  {
+
+    id: 'mock-c17',
+    clientName: 'Isac Diaz',
+    service: 'Albañil',
+    startISO: '2025-11-25T10:00:00.000Z', // Nov 25
+    endISO: '2025-11-25T11:00:00.000Z',
+    status: 'done',
+    cancelReason: '',
+    description: 'El trabajo es la construcción de un muro perimetral de 20 metros.',
+  },
+  {
+    id: 'mock-c18',
+    clientName: 'Eustass Napa',
+    service: 'Carpintería',
+    startISO: '2025-11-25T15:00:00.000Z', // Nov 25
+    endISO: '2025-11-25T16:00:00.000Z',
+    status: 'cancelled',
+    cancelReason: '',
+    description: 'El trabajo es la construcción de un muro perimetral de 20 metros.',
+  },
+
 ];
 
 // --- FIN DE DATOS FALSOS (MOCK) ---
@@ -166,8 +198,6 @@ const MOCK_JOBS: Job[] = [
 // --- ¡NUEVA LÍNEA! ---
 // Ordenamos el array MOCK_JOBS por fecha de inicio (startISO) en orden descendente (más reciente primero)
 MOCK_JOBS.sort((a, b) => b.startISO.localeCompare(a.startISO));
-// --------------------
-
 
 /** HU 1.8 – Trabajos por CLIENTE (VERSIÓN MOCKEADA PARA QA) */
 export async function fetchTrabajosCliente(clienteId: string, estado?: string): Promise<Job[]> {
