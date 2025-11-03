@@ -1,14 +1,14 @@
 'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import { Job, JobStatus } from './interfaces/types';
 import { fetchTrabajosCliente } from './services/api';
 import { fmt } from './utils/helpers';
 import { useRouter } from 'next/navigation';
 
-/* Paleta */
 const C = {
   title: '#0C4FE9',
-  text: '#1140BC',
+  text: '#1140BC', 
   borderMain: '#0C4FE9',
   borderBtn: '#1366FD',
   confirmed: '#1366FD',
@@ -22,7 +22,8 @@ const C = {
 
 type TabKey = 'all' | JobStatus;
 
-/* Íconos */
+const ITEMS_PER_PAGE = 10; 
+
 const IcoUser = ({ size = 24, color = C.text }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 21a8 8 0 0 0-16 0" />
@@ -56,12 +57,12 @@ const IcoClock = ({ size = 24, color = C.text }: { size?: number; color?: string
 export default function TrabajosAgendadosPage() {
   const [tab, setTab] = useState<TabKey>('all');
   const [jobs, setJobs] = useState<Job[] | null>(null);
+  const [currentPage, setCurrentPage] = useState(1); 
   const router = useRouter();
 
   useEffect(() => {
     let alive = true;
 
-    // Llamamos a la API. Esta ahora es la versión MOCK
     fetchTrabajosCliente('cliente_abc')
       .then((d) => {
         if (alive) setJobs(d);
@@ -73,7 +74,7 @@ export default function TrabajosAgendadosPage() {
     return () => {
       alive = false;
     };
-  }, []); // El 'useEffect' se ejecuta solo una vez al cargar
+  }, []); 
 
   const counts = useMemo(() => {
     const c = { confirmed: 0, pending: 0, cancelled: 0, done: 0 } as Record<JobStatus, number>;
@@ -86,40 +87,51 @@ export default function TrabajosAgendadosPage() {
     return tab === 'all' ? jobs : jobs.filter((j) => j.status === tab);
   }, [jobs, tab]);
 
-  // Si no hay trabajos en los estados confirmados, pendientes, cancelados, o terminados, mostramos el mensaje
-  if (
-    (tab === 'confirmed' && counts.confirmed === 0) ||
-    (tab === 'pending' && counts.pending === 0) ||
-    (tab === 'cancelled' && counts.cancelled === 0) ||
-    (tab === 'done' && counts.done === 0)
-  ) {
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginatedJobs = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filtered.slice(startIndex, endIndex);
+  }, [filtered, currentPage]);
+
+  if (!jobs) {
     return (
-      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
+      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px' }}>
         <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Mis Trabajos</h1>
-        <div style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
-        <p style={{ color: 'red', fontSize: '24px', fontWeight: 700 }}>DISPONIBLE EN EL SEGUNDO SPRINT</p>
+        <div className="line" style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
+        <p style={{textAlign: 'center'}}>Cargando mis trabajos...</p>
       </main>
     );
   }
 
-  // Mientras 'jobs' sea null (esperando la carga), mostramos un mensaje de carga
-  if (!jobs) {
+  if (tab !== 'all' && counts[tab] === 0) {
     return (
-      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px', textAlign: 'center' }}>
+      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px' }}>
         <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Mis Trabajos</h1>
-        <div style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
-        <p>Cargando mis trabajos...</p>
+        <div className="line" style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
+        <TabsComponent tab={tab} setTab={setTab} counts={counts} setCurrentPage={setCurrentPage} />
+        <p style={{ color: 'red', fontSize: '24px', fontWeight: 700, marginTop: 40, textAlign: 'center' }}>DISPONIBLE EN EL SEGUNDO SPRINT</p>
+      </main>
+    );
+  }
+
+  if (tab === 'all' && filtered.length === 0) {
+    return (
+      <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 500, color: C.text, fontSize: '20px' }}>
+        <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Mis Trabajos</h1>
+        <div className="line" style={{ height: 1.5, width: '660px', background: C.line, marginBottom: 10 }} />
+        <TabsComponent tab={tab} setTab={setTab} counts={counts} setCurrentPage={setCurrentPage} />
+        <p style={{ color: C.text, fontSize: '22px', fontWeight: 500, marginTop: 40, textAlign: 'center' }}>Aún no tienes trabajos agendados.</p>
       </main>
     );
   }
 
   return (
     <main style={{ padding: 24, maxWidth: 980, margin: '0 auto', fontWeight: 400 }}>
-      {/* Título */}
       <h1 style={{ fontSize: 36, fontWeight: 400, color: C.title, marginTop: 2, marginBottom: 0 }}>Mis Trabajos</h1>
 
-      {/* Línea más delgada */}
       <div
+        className="line"
         style={{
           height: 1.5,
           width: '660px',
@@ -128,66 +140,10 @@ export default function TrabajosAgendadosPage() {
         }}
       />
 
-      {/* Tabs */}
-      <div role="tablist" aria-label="Filtros de estado" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
-        {(['all', 'confirmed', 'pending', 'cancelled', 'done'] as TabKey[]).map((k) => {
-          const active = tab === k;
-          const badge =
-            k === 'all'
-              ? jobs?.length ?? 0
-              : k === 'confirmed'
-              ? counts.confirmed
-              : k === 'pending'
-              ? counts.pending
-              : k === 'cancelled'
-              ? counts.cancelled
-              : counts.done;
+      <TabsComponent tab={tab} setTab={setTab} counts={counts} setCurrentPage={setCurrentPage} />
 
-          const baseBtn: React.CSSProperties = {
-            borderRadius: 8,
-            border: `2px solid ${C.borderBtn}`,
-            background: active ? C.active : C.white,
-            color: active ? C.white : C.text,
-            fontWeight: 400,
-            fontSize: 16,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            padding: '8px 14px',
-            lineHeight: '22px',
-          };
-
-          const isAll = k === 'all';
-          const allSize: React.CSSProperties = isAll
-            ? {
-                padding: '8px 16px',
-                minWidth: 120,
-                height: 40,
-              }
-            : {};
-
-          return (
-            <button key={k} onClick={() => setTab(k)} style={{ ...baseBtn, ...allSize }}>
-              {k === 'all'
-                ? 'Todos'
-                : k === 'confirmed'
-                ? 'Confirmados'
-                : k === 'pending'
-                ? `Pendientes${badge > 0 ? ` (${badge})` : ''}`
-                : k === 'cancelled'
-                ? 'Cancelados'
-                : 'Terminados'}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Lista */}
       <div
-        className="scrollwrap"
+        className="scrollwrap job-list"
         style={{
           display: 'grid',
           gap: 14,
@@ -197,7 +153,7 @@ export default function TrabajosAgendadosPage() {
           width: '660px',
         }}
       >
-        {(filtered ?? []).map((job) => {
+        {paginatedJobs.map((job) => {
           const { fecha, hora } = fmt(job.startISO);
           const { hora: horaFin } = fmt(job.endISO);
           const chipBg =
@@ -212,6 +168,7 @@ export default function TrabajosAgendadosPage() {
           return (
             <article key={job.id} style={{ border: `2.5px solid ${C.borderMain}`, borderRadius: 8, background: C.white, padding: '14px 18px' }}>
               <div
+                className="job-grid"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '1.2fr 1fr 1fr auto',
@@ -221,7 +178,6 @@ export default function TrabajosAgendadosPage() {
                   alignItems: 'center',
                 }}
               >
-                {/* Cliente */}
                 <div style={{ gridColumn: '1', gridRow: '1', display: 'flex', gap: 8, alignItems: 'center' }}>
                   <IcoUser />
                   <div>
@@ -231,7 +187,6 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                {/* Fecha */}
                 <div style={{ gridColumn: '2', gridRow: '1', display: 'flex', gap: 8, alignItems: 'center' }}>
                   <IcoCalendar />
                   <div style={{ transform: 'translateY(3px)' }}>
@@ -241,7 +196,6 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                {/* Hora inicio */}
                 <div style={{ gridColumn: '3', gridRow: '1', display: 'flex', gap: 8, alignItems: 'center' }}>
                   <IcoClock />
                   <div style={{ transform: 'translateY(3px)' }}>
@@ -251,19 +205,22 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                {/* Botón “Ver Detalles” */}
                 <div style={{ gridColumn: '4', gridRow: '1 / span 2', display: 'flex', justifyContent: 'flex-end' }}>
                   <button
                     onClick={() => {
-                      alert('PAGINA EN CONSTRUCCION'); // Mostrar "Página en construcción" al hacer clic
+                      const base = job.status === 'done'
+                        ? '/epic_VerDetallesTerminadosAmbos'
+                        : '/epic_VerDetallesAmbos';
+
+                      router.push(`${base}?id=${encodeURIComponent(job.id)}&role=cliente`);
                     }}
                     style={{
                       padding: '8px 14px',
                       minWidth: 110,
                       height: 36,
                       borderRadius: 8,
-                      background: C.confirmed,
-                      color: C.white,
+                      background: '#1366FD',
+                      color: '#fff',
                       border: 'none',
                       cursor: 'pointer',
                     }}
@@ -272,7 +229,6 @@ export default function TrabajosAgendadosPage() {
                   </button>
                 </div>
 
-                {/* Estado */}
                 <div style={{ gridColumn: '1', gridRow: '2' }}>
                   <div
                     style={{
@@ -280,7 +236,7 @@ export default function TrabajosAgendadosPage() {
                       padding: '8px 16px',
                       borderRadius: 12,
                       background: chipBg,
-                      color: job.status === 'pending' ? '#000000' : C.white, // ← negro solo para “Pendiente”
+                      color: job.status === 'pending' ? '#000000' : job.status === 'cancelled' ? '#000000' : job.status === 'done' ? '#000000' : C.white,
                     }}
                   >
                     {job.status === 'confirmed'
@@ -293,7 +249,6 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                {/* Servicio */}
                 <div style={{ gridColumn: '2', gridRow: '2', display: 'flex', gap: 8, alignItems: 'center' }}>
                   <IcoBrief />
                   <div>
@@ -303,7 +258,6 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                {/* Hora fin */}
                 <div style={{ gridColumn: '3', gridRow: '2', display: 'flex', gap: 8, alignItems: 'center' }}>
                   <IcoClock />
                   <div>
@@ -318,28 +272,194 @@ export default function TrabajosAgendadosPage() {
         })}
       </div>
 
-      {/* Scrollbar */}
+      <div className="footer-controls" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center', 
+        marginTop: '20px', 
+        width: '660px'
+      }}>
+        
+        <button
+          onClick={() => router.push('/')}
+          style={{
+            padding: '10px 20px',
+            height: 40,
+            borderRadius: 8,
+            background: C.confirmed,
+            color: C.white,
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}
+        >
+          Volver
+        </button>
+
+        {totalPages > 1 && (
+          <div className="pagination" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              style={{
+                padding: '10px 15px',
+                borderRadius: 5,
+                border: '1px solid #ddd',
+                background: C.white,
+                color: C.text,
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                opacity: currentPage === 1 ? 0.6 : 1,
+              }}
+            >
+              Anterior
+            </button>
+            
+            <span style={{ color: C.text, fontSize: '16px', fontWeight: 500 }}>
+              Página {currentPage} de {totalPages}
+            </span>
+            
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: '10px 15px',
+                borderRadius: 5,
+                border: '1px solid #ddd',
+                background: C.white,
+                color: C.text,
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                opacity: currentPage === totalPages ? 0.6 : 1,
+              }}
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
+
+        {totalPages <= 1 && (
+          <div /> 
+        )}
+      </div>
+
       <style jsx global>{`
-        .scrollwrap::-webkit-scrollbar {
-          width: 10px;
-        }
-        .scrollwrap::-webkit-scrollbar-track {
-          background: #cbd9ff;
-        }
-        .scrollwrap::-webkit-scrollbar-thumb {
-          background: ${C.text};
-          border-radius: 0;
-        }
-        .scrollwrap {
-          scrollbar-color: ${C.text} #cbd9ff;
-        }
+        .scrollwrap::-webkit-scrollbar { width: 10px; }
+        .scrollwrap::-webkit-scrollbar-track { background: #cbd9ff; }
+        .scrollwrap::-webkit-scrollbar-thumb { background: ${C.text}; border-radius: 0; }
+        .scrollwrap { scrollbar-color: ${C.text} #cbd9ff; }
 
         button:active {
           background: ${C.active} !important;
           border-color: ${C.active} !important;
           color: ${C.white} !important;
         }
+
+        @media (max-width: 768px) {
+          main { padding: 12px !important; }
+          h1 { fontSize: 28px !important; }
+          .line, .job-list, .footer-controls { width: 100% !important; max-width: 100% !important; }
+          .job-grid { 
+            grid-template-columns: 1fr !important;
+            grid-template-rows: repeat(6, auto) !important;
+            gap: 12px !important;
+          }
+          .job-grid > div { grid-column: 1 !important; grid-row: auto !important; }
+          .footer-controls { flex-direction: column !important; gap: 12px !important; }
+          .footer-controls button, .pagination { width: 100% !important; }
+          .pagination { flex-wrap: wrap !important; justify-content: center !important; }
+        }
       `}</style>
+
     </main>
+  );
+}
+
+interface TabsProps {
+  tab: TabKey;
+  setTab: (tab: TabKey) => void;
+  setCurrentPage: (page: number) => void;
+  counts: Record<JobStatus, number>;
+}
+
+function TabsComponent({ tab, setTab, counts, setCurrentPage }: TabsProps) {
+  return (
+    
+    <div 
+      role="tablist" 
+      aria-label="Filtros de estado" 
+      className="tabs-container"
+      style={{ 
+        display: 'flex', 
+        gap: 12,
+        marginBottom: 14, 
+        width: '660px' 
+      }}
+    >
+      {(['all', 'confirmed', 'pending', 'cancelled', 'done'] as TabKey[]).map((k) => {
+        const active = tab === k;
+        const badge =
+          k === 'all'
+            ? (counts.confirmed + counts.pending + counts.cancelled + counts.done) 
+            : counts[k];
+
+        const baseBtn: React.CSSProperties = {
+          borderRadius: 8,
+          border: `2px solid ${C.borderBtn}`, 
+          background: active ? C.active : C.white,
+          color: active ? C.white : C.text,
+          fontWeight: 400,
+          fontSize: 16,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          padding: '8px 12px',
+          lineHeight: '22px',
+          whiteSpace: 'nowrap',
+        };
+
+        const isAll = k === 'all';
+        const allSize: React.CSSProperties = isAll
+          ? {
+              padding: '8px 14px',
+              minWidth: 115,
+              height: 40,
+            }
+          : {};
+
+        return (
+          <button 
+            key={k} 
+            onClick={() => {
+              setTab(k);
+              setCurrentPage(1); 
+            }} 
+            style={{ ...baseBtn, ...allSize }}
+          >
+            {k === 'all'
+              ? `Todos (${badge})` 
+              : k === 'confirmed'
+              ? `Confirmados (${badge})` 
+              : k === 'pending'
+              ? `Pendientes (${badge})` 
+              : k === 'cancelled'
+              ? `Cancelados (${badge})` 
+              : `Terminados (${badge})`}
+          </button>
+        );
+      })}
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .tabs-container { 
+            width: 100% !important; 
+            flex-wrap: wrap !important; 
+            gap: 8px !important; 
+          }
+        }
+      `}</style>
+    </div>
   );
 }

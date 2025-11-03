@@ -1,10 +1,24 @@
 import { JobStatus } from '../interfaces/types';
 
+// 👇 Zona horaria destino (evita el desfase por el "Z" en los ISO mocks)
+const TZ = 'America/La_Paz'; // 👈 NUEVO
 
 export const fmt = (iso: string) => {
   const d = new Date(iso);
-  const fecha = d.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' });
-  const hora = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  // 👇 Forzamos locale y zona para la FECHA
+  const fecha = d.toLocaleDateString('es-BO', {          // 👈 es-BO para formato local
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    timeZone: TZ,                                        // 👈 fija zona
+  });
+  // 👇 Forzamos 24h y misma zona para la HORA
+  const hora = d.toLocaleTimeString('es-BO', {           // 👈 es-BO
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,                                       // 👈 24 horas
+    timeZone: TZ,                                        // 👈 fija zona
+  });
   return { fecha, hora };
 };
 
