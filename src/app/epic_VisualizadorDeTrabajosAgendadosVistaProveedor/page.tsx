@@ -145,17 +145,18 @@ export default function TrabajosAgendadosPage() {
 
       <TabsComponent tab={tab} setTab={setTab} counts={counts} setCurrentPage={setCurrentPage} />
 
-      <div
-        className="scrollwrap job-list"
-        style={{
-          display: 'grid',
-          gap: 14,
-          maxHeight: 520,
-          overflow: 'auto',
-          paddingRight: 8,
-          width: '660px',
-        }}
-      >
+        <div
+          className="scrollwrap job-list"
+          style={{
+            display: 'grid',
+            gap: 14,
+            maxHeight: 520,
+            overflow: 'auto',
+            paddingRight: 0,          // 👈 QUITAMOS padding extra
+            width: '660px',
+            boxSizing: 'content-box', // 👈 asegura mismo ancho exacto
+          }}
+          >
         {paginatedJobs.map((job) => {
           const { fecha, hora } = fmt(job.startISO);
           const { hora: horaFin } = fmt(job.endISO);
@@ -208,13 +209,22 @@ export default function TrabajosAgendadosPage() {
                   </div>
                 </div>
 
-                <div style={{ gridColumn: '4', gridRow: '1 / span 2', display: 'flex', justifyContent: 'flex-end' }}>
+                <div
+                  className="job-btn-wrapper"
+                  style={{
+                    gridColumn: '4',
+                    gridRow: '1 / span 2',
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                  }}
+                >
                   <button
                     onClick={() => {
                       localStorage.setItem('selectedJob', JSON.stringify(job));
-                      const base = job.status === 'done'
-                        ? '/epic_VerDetallesTerminadosAmbos'
-                        : '/epic_VerDetallesAmbos';
+                      const base =
+                        job.status === 'done'
+                          ? '/epic_VerDetallesTerminadosAmbos'
+                          : '/epic_VerDetallesAmbos';
 
                       router.push(`${base}?id=${encodeURIComponent(job.id)}&role=proveedor`);
                     }}
@@ -347,38 +357,79 @@ export default function TrabajosAgendadosPage() {
       </div>
 
       <style jsx global>{`
-        .scrollwrap::-webkit-scrollbar { 
-            width: 6px;        /* más delgado */
-            margin-right: 0;   /* se pega al borde */
-          }
-        .job-list {
-          padding-right: 4px !important; /* elimina el espacio blanco a la derecha */
+        .scrollwrap::-webkit-scrollbar {
+          width: 6px;
+          margin-right: 0;
         }
-        .scrollwrap::-webkit-scrollbar-track { background: #cbd9ff; }
-        .scrollwrap::-webkit-scrollbar-thumb { background: ${C.text}; border-radius: 0; }
-        .scrollwrap { scrollbar-color: ${C.text} #cbd9ff; }
+        .job-list {
+          padding-right: 4px !important;
+        }
+        .scrollwrap::-webkit-scrollbar-track {
+          background: #cbd9ff;
+        }
+        .scrollwrap::-webkit-scrollbar-thumb {
+          background: ${C.text};
+          border-radius: 0;
+        }
+        .scrollwrap {
+          scrollbar-color: ${C.text} #cbd9ff;
+        }
 
         button:active {
           background: ${C.active} !important;
-          border-color: ${C.active} !important; /* Corregido: important */
+          border-color: ${C.active} !important;
           color: ${C.white} !important;
         }
 
         @media (max-width: 768px) {
-          main { padding: 12px !important; }
-          h1 { fontSize: 28px !important; }
-          .line, .job-list, .footer-controls { width: 100% !important; max-width: 100% !important; }
-          .job-grid { 
-            grid-template-columns: 1fr !important;
-            grid-template-rows: repeat(6, auto) !important;
+          main {
+            padding: 12px !important;
+          }
+          h1 {
+            fontSize: 28px !important;
+          }
+
+          .line,
+          .job-list,
+          .footer-controls {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+
+          /* 🧱 Tarjeta en columna */
+          .job-grid {
+            display: flex !important;
+            flex-direction: column !important;
             gap: 12px !important;
           }
-          .job-grid > div { grid-column: 1 !important; grid-row: auto !important; }
-          .footer-controls { flex-direction: column !important; gap: 12px !important; }
-          .footer-controls button, .pagination { width: 100% !important; }
-          .pagination { flex-wrap: wrap !important; justify-content: center !important; }
+
+          .job-grid > div {
+            grid-column: auto !important;
+            grid-row: auto !important;
+          }
+
+          /* 🎯 Botón al FINAL de la tarjeta */
+          .job-btn-wrapper {
+            order: 999 !important;
+            align-self: flex-start;
+            margin-top: 4px;
+          }
+
+          .footer-controls {
+            flex-direction: column !important;
+            gap: 12px !important;
+          }
+          .footer-controls button,
+          .pagination {
+            width: 100% !important;
+          }
+          .pagination {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+          }
         }
       `}</style>
+
 
     </main>
   );

@@ -1,5 +1,4 @@
 'use client';
-
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Job } from '@/app/epic_VisualizadorDeTrabajosAgendadosVistaCliente/interfaces/types';
@@ -26,6 +25,7 @@ function formatFechaLarga(iso: string) {
     year: 'numeric',
   }).format(d);
 }
+
 function formatHora(iso: string) {
   const d = new Date(iso);
   return new Intl.DateTimeFormat('es-ES', {
@@ -41,9 +41,11 @@ interface JobDetail extends Job {
   cost?: number;
   cancelledBy?: string;
 }
+
 interface JobWithProvider extends Job {
   providerName?: string; // opcional, por si el mock la trae
 }
+
 // --------------------
 // Lógica del detalle (cliente y proveedor)
 // --------------------
@@ -190,11 +192,11 @@ function DetailsPage() {
   // Etiqueta depende del rol:
   // - Si es vista CLIENTE, mostramos "Proveedor"
   // - Si es vista PROVEEDOR, mostramos "Cliente"
-const labelPersona = role === 'cliente' ? 'Proveedor' : 'Cliente';
-const nombrePersona =
-  role === 'cliente'
-    ? ((job as JobWithProvider).providerName ?? job.clientName)  // usa providerName si lo tienes
-    : job.clientName;
+  const labelPersona = role === 'cliente' ? 'Proveedor' : 'Cliente';
+  const nombrePersona =
+    role === 'cliente'
+      ? ((job as JobWithProvider).providerName ?? job.clientName)  // usa providerName si lo tienes
+      : job.clientName;
   const fechaLarga = formatFechaLarga(job.startISO);
   const horaIni = formatHora(job.startISO);
   const horaFin = formatHora(job.endISO);
@@ -223,7 +225,7 @@ const nombrePersona =
 
       <section
         style={{
-          border: `2.5px solid ${C.borderMain}`,
+          border: `2.5px solid ${C.white}`,
           borderRadius: 10,
           background: C.white,
           padding: '18px 20px',
@@ -347,21 +349,21 @@ export default function Page() {
       <DetailsPage />
 
       <style jsx global>{`
-  /* ---- Responsividad ---- */
-  @media (max-width: 768px) {
-    main {
-      padding: 12px !important;
-    }
-    section {
-      font-size: 16px !important;
-      line-height: 24px !important;
-    }
-    button {
-      width: 100%;
-      margin-top: 8px;
-    }
-  }
-`}</style>
+        /* ---- Responsividad ---- */
+        @media (max-width: 768px) {
+          main {
+            padding: 12px !important;
+          }
+          section {
+            font-size: 16px !important;
+            line-height: 24px !important;
+          }
+          button {
+            width: 100%;
+            margin-top: 8px;
+          }
+        }
+      `}</style>
     </Suspense>
   );
 }
