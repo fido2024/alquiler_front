@@ -347,7 +347,13 @@ export default function TrabajosAgendadosPage() {
       </div>
 
       <style jsx global>{`
-        .scrollwrap::-webkit-scrollbar { width: 10px; }
+        .scrollwrap::-webkit-scrollbar { 
+            width: 6px;        /* más delgado */
+            margin-right: 0;   /* se pega al borde */
+          }
+        .job-list {
+          padding-right: 4px !important; /* elimina el espacio blanco a la derecha */
+        }
         .scrollwrap::-webkit-scrollbar-track { background: #cbd9ff; }
         .scrollwrap::-webkit-scrollbar-thumb { background: ${C.text}; border-radius: 0; }
         .scrollwrap { scrollbar-color: ${C.text} #cbd9ff; }

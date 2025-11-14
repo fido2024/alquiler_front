@@ -218,18 +218,41 @@ export default function Page() {
     >
       <DetailsPage />
 
-      <style jsx global>{`
+<style jsx global>{`
+  /* ============================
+     FIX 1 — RESPONSIVE DETALLES
+     ============================ */
   @media (max-width: 768px) {
     main {
       padding: 12px !important;
     }
+
     section {
-      font-size: 16px !important;
-      line-height: 24px !important;
+      font-size: 15px !important;
+      line-height: 22px !important;
+      padding: 14px !important;
     }
+
+    /* Las filas ahora se apilan y no se cortan */
+    section > div,
+    .row,
+    .detail-row {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 4px !important;
+    }
+
+    /* El label ya no ocupa 140px fijos */
+    section span[style*="min-width: 140"] {
+      min-width: auto !important;
+      width: auto !important;
+    }
+
+    /* Botones a una sola columna */
     button {
-      width: 100%;
-      margin-top: 8px;
+      width: 100% !important;
+      margin-top: 10px !important;
     }
   }
 `}</style>

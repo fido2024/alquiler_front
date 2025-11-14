@@ -201,7 +201,7 @@ const nombrePersona =
 
   const j: JobDetail = job;
   const costoNum = j.price ?? j.cost ?? 250;
-  const costo = `${costoNum}Bs`;
+  const costo = `${costoNum} Bs`;
 
   const justificacion =
     job.cancelReason?.trim() ? job.cancelReason : 'Sin justificación';

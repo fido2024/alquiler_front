@@ -344,7 +344,14 @@ export default function TrabajosAgendadosPage() {
       </div>
 
       <style jsx global>{`
-        .scrollwrap::-webkit-scrollbar { width: 10px; }
+        .scrollwrap::-webkit-scrollbar { 
+            width: 6px;        /* más delgado */
+            margin-right: 0;   /* se pega al borde */
+          }
+        .job-list {
+          padding-right: 4px !important; /* elimina el espacio blanco a la derecha */
+        }
+
         .scrollwrap::-webkit-scrollbar-track { background: #cbd9ff; }
         .scrollwrap::-webkit-scrollbar-thumb { background: ${C.text}; border-radius: 0; }
         .scrollwrap { scrollbar-color: ${C.text} #cbd9ff; }
@@ -452,15 +459,44 @@ function TabsComponent({ tab, setTab, counts, setCurrentPage }: TabsProps) {
         );
       })}
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .tabs-container { 
-            width: 100% !important; 
-            flex-wrap: wrap !important; 
-            gap: 8px !important; 
-          }
-        }
-      `}</style>
+<style jsx global>{`
+  /* ============================
+     FIX 1 — RESPONSIVE DETALLES
+     ============================ */
+  @media (max-width: 768px) {
+    main {
+      padding: 12px !important;
+    }
+
+    section {
+      font-size: 15px !important;
+      line-height: 22px !important;
+      padding: 14px !important;
+    }
+
+    /* Las filas ahora se apilan y no se cortan */
+    section > div,
+    .row,
+    .detail-row {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 4px !important;
+    }
+
+    /* El label ya no ocupa 140px fijos */
+    section span[style*="min-width: 140"] {
+      min-width: auto !important;
+      width: auto !important;
+    }
+
+    /* Botones a una sola columna */
+    button {
+      width: 100% !important;
+      margin-top: 10px !important;
+    }
+  }
+`}</style>
     </div>
   );
 }
