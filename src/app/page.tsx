@@ -48,6 +48,13 @@ export default function HomePage() {
         >
           Ir a Vista Proveedor
         </Link>
+
+        <Link 
+          href="/epic_MasInformacion-VistaProveedor" 
+          style={buttonStyle}
+        >
+          Ir a Más Información Vista Proveedor
+        </Link>
       </div>
     </main>
   );
