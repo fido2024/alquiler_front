@@ -50,7 +50,7 @@ export default function HomePage() {
         </Link>
 
         <Link 
-          href="/epic_MasInformacion-VistaProveedor" 
+          href="/epic_PerfilProveedor-VistaProveedor" 
           style={buttonStyle}
         >
           Ir a Más Información Vista Proveedor
